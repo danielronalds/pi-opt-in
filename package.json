@@ -1,0 +1,25 @@
+{
+  "name": "pi-turn-notifications",
+  "version": "0.1.0",
+  "description": "Opt-in macOS notifications when a Pi agent response is ready.",
+  "author": "Daniel Ronalds",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielronalds/pi-turn-notifications.git"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "macos",
+    "notifications"
+  ],
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions/turn-notification.ts"
+    ]
+  }
+}
