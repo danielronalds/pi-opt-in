@@ -121,6 +121,7 @@ macOS may require notification or Automation permission during manual testing.
 
 - Use TypeScript and follow the existing tab indentation in `src/index.ts`.
 - Prefer descriptive names, early returns, and simple control flow.
+- Avoid explicit return types where TypeScript can infer them.
 - Keep comments for non-obvious reasoning rather than restating code.
 - Use LF line endings.
 - Use UK English in documentation.

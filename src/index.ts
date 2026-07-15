@@ -1,5 +1,6 @@
 import { basename } from "node:path";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { MacosProvider } from "./macos-provider.ts";
 
 const NOTIFICATION_BODY_MAX_LENGTH = 200;
 const NOTIFICATION_STATE_ENTRY = "turn-notification-state";
@@ -8,13 +9,17 @@ interface NotificationState {
 	enabled: boolean;
 }
 
-const notificationScript = `
-on run argv
-	display notification (item 2 of argv) with title (item 1 of argv)
-end run
-`.trim();
+function getNotificationProvider(pi: ExtensionAPI) {
+	switch (process.platform) {
+		case "darwin":
+			return new MacosProvider(pi);
+		default:
+			return undefined;
+	}
+}
 
 export default function (pi: ExtensionAPI) {
+	const notificationProvider = getNotificationProvider(pi);
 	let latestMessageText = "";
 	let notificationsEnabled = false;
 
@@ -94,7 +99,12 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.on("agent_settled", async (_event, ctx) => {
-		if (!notificationsEnabled || process.platform !== "darwin" || !latestMessageText) {
+		if (!notificationsEnabled || !latestMessageText) {
+			return;
+		}
+
+		if (!notificationProvider) {
+			console.error(`Desktop notifications are not supported on ${process.platform}`);
 			return;
 		}
 
@@ -107,6 +117,6 @@ export default function (pi: ExtensionAPI) {
 				: messageCharacters.join("");
 		latestMessageText = "";
 
-		await pi.exec("/usr/bin/osascript", ["-e", notificationScript, title, body]);
+		await notificationProvider.sendNotification({ title, body });
 	});
 }
