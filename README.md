@@ -1,22 +1,10 @@
 # Pi Turn Notifications
 
-A [Pi](https://github.com/earendil-works/pi-mono) extension that sends a native macOS notification when Pi has finished responding and is waiting for input.
+A [Pi](https://github.com/earendil-works/pi-mono) extension that sends a notification when Pi has finished responding and is waiting for input.
 
 Notifications are disabled by default and can be enabled independently for each Pi session.
 
-## Features
-
-- Native macOS notifications using the built-in `osascript` command
-- Notifications only after Pi has fully settled, not after individual tool calls
-- Notification title containing the current directory name
-- Notification body containing the first 200 characters of Pi's response
-- Per-session notification preference that survives reloads and resumed sessions
-- Footer status while notifications are enabled
-
-## Requirements
-
-- macOS
-- Pi 0.80.6 or later
+> This extension is very vibecoded. Do not expect perfection, it does what it says on the tin
 
 ## Install
 
@@ -28,6 +16,11 @@ pi install git:github.com/danielronalds/pi-turn-notifications
 
 Restart Pi or run `/reload` in an existing Pi session after installation.
 
+### Requirements
+
+- macOS
+- Pi 0.80.6 or later
+
 ## Usage
 
 Run:
@@ -36,10 +29,10 @@ Run:
 /notify
 ```
 
-Select **On** or **Off** in the menu. New sessions start with notifications disabled. Your choice is retained when reloading or resuming the same session.
+Select **On** or **Off** in the menu. New sessions start with notifications disabled. State is retained when reloading or resuming the same session.
 
 macOS may ask for permission to send notifications the first time the extension runs.
 
-## Licence
+## Limitations
 
-[MIT](LICENSE)
+Currently this extension only supports macOS, linux support will be added.
