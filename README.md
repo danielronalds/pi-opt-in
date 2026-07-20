@@ -29,9 +29,9 @@ Run:
 /opt-in
 ```
 
-Select **On** or **Off** in the menu. New sessions start with notifications disabled. State is retained when reloading or resuming the same session.
+Use the settings menu to enable or disable desktop notifications and their sound. New sessions start with notifications disabled and sound enabled. State is retained when reloading or resuming the same session.
 
-macOS may ask for permission to send notifications the first time the extension runs.
+macOS may ask for permission to send notifications the first time the extension runs. Notification sounds may be suppressed by macOS notification settings or Focus mode.
 
 ## Limitations
 

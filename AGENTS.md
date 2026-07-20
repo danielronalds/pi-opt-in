@@ -18,8 +18,8 @@ The project is licensed under MIT, copyright Daniel Ronalds.
 
 - macOS is the only supported platform.
 - Notifications are disabled by default for every new Pi session.
-- `/opt-in` opens a small UI for selecting On or Off.
-- The setting is persisted in the session and restored after reloads and resumes.
+- `/opt-in` opens a small settings UI for enabling or disabling notifications and their sound.
+- Notification and sound settings are persisted in the session and restored after reloads and resumes.
 - State follows the active session branch and is restored after tree navigation.
 - A footer status is displayed while notifications are enabled.
 - Notifications fire only after `agent_settled`, when Pi has no automatic retry, compaction retry, tool continuation, or queued follow-up remaining.
@@ -27,6 +27,7 @@ The project is licensed under MIT, copyright Daniel Ronalds.
 - A notification is sent only when the settled run produced non-empty assistant text.
 - The title is the current directory basename enclosed in quotation marks.
 - The body is a whitespace-normalised copy of the assistant message, truncated to 200 Unicode characters.
+- Notification sound is enabled by default and can be disabled independently for each session.
 - Native notifications are sent through the built-in `/usr/bin/osascript` command.
 
 ## Repository structure

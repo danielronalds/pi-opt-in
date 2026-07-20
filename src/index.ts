@@ -1,6 +1,15 @@
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import {
+	getSettingsListTheme,
+	type ExtensionAPI,
+	type ExtensionContext,
+} from "@earendil-works/pi-coding-agent";
+import { Container, type SettingItem, SettingsList, Text } from "@earendil-works/pi-tui";
 import { MacosProvider } from "./macos-provider.ts";
-import { NotificationSession, NOTIFICATION_STATE_ENTRY } from "./notification-session.ts";
+import {
+	NotificationSession,
+	NOTIFICATION_STATE_ENTRY,
+	type NotificationState,
+} from "./notification-session.ts";
 
 function getNotificationProvider(pi: ExtensionAPI) {
 	switch (process.platform) {
@@ -25,28 +34,70 @@ export default function (pi: ExtensionAPI) {
 	}
 
 	pi.registerCommand("opt-in", {
-		description: "Enable or disable desktop notifications for this session",
+		description: "Configure desktop notifications for this session",
 		handler: async (_args, ctx) => {
-			if (!ctx.hasUI) {
+			if (ctx.mode !== "tui") {
+				if (ctx.hasUI) {
+					ctx.ui.notify("/opt-in requires TUI mode", "error");
+				}
 				return;
 			}
 
-			const selection = await ctx.ui.select(
-				`Desktop notifications are currently ${notifications.enabled ? "on" : "off"}`,
-				["On", "Off"],
-			);
-			if (!selection) {
-				return;
-			}
+			const items: SettingItem[] = [
+				{
+					id: "notifications",
+					label: "Desktop notifications",
+					description: "Notify when Pi has finished responding and is waiting for input.",
+					currentValue: notifications.enabled ? "On" : "Off",
+					values: ["On", "Off"],
+				},
+				{
+					id: "sound",
+					label: "Play sound",
+					description: "Play the default macOS notification sound.",
+					currentValue: notifications.soundEnabled ? "On" : "Off",
+					values: ["On", "Off"],
+				},
+			];
 
-			const enabled = selection === "On";
-			if (enabled !== notifications.enabled) {
-				notifications.enabled = enabled;
-				pi.appendEntry(NOTIFICATION_STATE_ENTRY, { enabled });
-			}
+			await ctx.ui.custom((tui, theme, _keybindings, done) => {
+				const container = new Container();
+				container.addChild(
+					new Text(theme.fg("accent", theme.bold("Desktop Notification Settings")), 1, 1),
+				);
 
-			updateStatus(ctx);
-			ctx.ui.notify(`Desktop notifications ${enabled ? "enabled" : "disabled"}`, "info");
+				const settingsList = new SettingsList(
+					items,
+					items.length,
+					getSettingsListTheme(),
+					(id, newValue) => {
+						if (id === "notifications") {
+							notifications.enabled = newValue === "On";
+						} else if (id === "sound") {
+							notifications.soundEnabled = newValue === "On";
+						} else {
+							return;
+						}
+
+						pi.appendEntry<NotificationState>(NOTIFICATION_STATE_ENTRY, {
+							enabled: notifications.enabled,
+							soundEnabled: notifications.soundEnabled,
+						});
+						updateStatus(ctx);
+					},
+					() => done(undefined),
+				);
+				container.addChild(settingsList);
+
+				return {
+					render: (width: number) => container.render(width),
+					invalidate: () => container.invalidate(),
+					handleInput: (data: string) => {
+						settingsList.handleInput(data);
+						tui.requestRender();
+					},
+				};
+			});
 		},
 	});
 

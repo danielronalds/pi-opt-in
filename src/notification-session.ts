@@ -5,27 +5,31 @@ import type { NotificationProvider } from "./notification-provider.ts";
 const NOTIFICATION_BODY_MAX_LENGTH = 200;
 export const NOTIFICATION_STATE_ENTRY = "turn-notification-state";
 
-interface NotificationState {
+export interface NotificationState {
 	enabled: boolean;
+	soundEnabled: boolean;
 }
 
 export class NotificationSession {
 	enabled = false;
+	soundEnabled = true;
 	private latestMessageText = "";
 
 	constructor(private readonly provider?: NotificationProvider) {}
 
 	restore(entries: SessionEntry[]) {
 		this.enabled = false;
+		this.soundEnabled = true;
 
 		for (const entry of entries) {
 			if (entry.type !== "custom" || entry.customType !== NOTIFICATION_STATE_ENTRY) {
 				continue;
 			}
 
-			const state = entry.data as NotificationState | undefined;
+			const state = entry.data as Partial<NotificationState> | undefined;
 			if (typeof state?.enabled === "boolean") {
 				this.enabled = state.enabled;
+				this.soundEnabled = typeof state.soundEnabled === "boolean" ? state.soundEnabled : true;
 			}
 		}
 	}
@@ -69,6 +73,6 @@ export class NotificationSession {
 				: messageCharacters.join("");
 		this.latestMessageText = "";
 
-		await this.provider.sendNotification({ title, body });
+		await this.provider.sendNotification({ title, body, playSound: this.soundEnabled });
 	}
 }

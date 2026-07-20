@@ -3,14 +3,18 @@ import type { Notification, NotificationProvider } from "./notification-provider
 
 const notificationScript = `
 on run argv
-	display notification (item 2 of argv) with title (item 1 of argv)
+	if (item 3 of argv) is "true" then
+		display notification (item 2 of argv) with title (item 1 of argv) sound name "default"
+	else
+		display notification (item 2 of argv) with title (item 1 of argv)
+	end if
 end run
 `.trim();
 
 export class MacosProvider implements NotificationProvider {
 	constructor(private readonly pi: Pick<ExtensionAPI, "exec">) {}
 
-	async sendNotification({ title, body }: Notification) {
-		await this.pi.exec("/usr/bin/osascript", ["-e", notificationScript, title, body]);
+	async sendNotification({ title, body, playSound }: Notification) {
+		await this.pi.exec("/usr/bin/osascript", ["-e", notificationScript, title, body, String(playSound)]);
 	}
 }
